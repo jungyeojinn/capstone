@@ -1,4 +1,9 @@
+import django
 from pathlib import Path
+import datetime
+from django.utils.translation import gettext
+#django.utils.translation.ugettext = gettext
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,6 +20,18 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+#AttributeError: 'JWTCookieAuthentication' object has no attribute 'has_permission'오류 해결 위해 추가
+#효과X
+"""THIRD_PARTIES = [
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+]"""
+
+
+
 
 # Application definition
 
@@ -26,13 +43,18 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts.apps.AccountsConfig', # accounts 앱 추가
+    'rest_framework', # REST framework 추가
+    'rest_framework_simplejwt', # JWT 추가
+    'rest_framework.authtoken', # 토큰 인증 추가
+    'freights.apps.FreightsConfig', # freight 앱 추가
+    'dj_rest_auth', #JWTcookieAuthentication 클래스 사용 위해 추가
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -115,9 +137,35 @@ AUTH_USER_MODEL = 'accounts.User' # accounts 앱의 User 모델을 사용자 모
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 기본 authentication 방식을 헤더의 authorization value 확인하여 검증하는 방식으로 설정
     ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ],
 } # JWT 토큰을 확인하기 위해 설정
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': False,
+
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'VERIFYING_KEY': "",
+    'AUDIENCE': None,
+    'ISSUER': None,
+
+    'AUTH_HEADER_TYPES': ("Bearer",),
+    'AUTH_HEADER_NAME': "HTTP_AUTHORIZATION",
+    'USER_ID_FIELD': 'userId',
+    'USER_ID_CLAIM': 'userId',
+
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': "token_type",
+
+    'JTI_CLAIM': 'jti',
+}
