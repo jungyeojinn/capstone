@@ -20,19 +20,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-#AttributeError: 'JWTCookieAuthentication' object has no attribute 'has_permission'오류 해결 위해 추가
-#효과X
-"""THIRD_PARTIES = [
-    'rest_framework',
-    'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist',
-    'rest_framework.authtoken',
-    'dj_rest_auth',
-]"""
-
-
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -45,16 +32,14 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig', # accounts 앱 추가
     'rest_framework', # REST framework 추가
     'rest_framework_simplejwt', # JWT 추가
-    'rest_framework.authtoken', # 토큰 인증 추가
     'freights.apps.FreightsConfig', # freight 앱 추가
-    'dj_rest_auth', #JWTcookieAuthentication 클래스 사용 위해 추가
+    'quotes.apps.QuotesConfig', # quotes 앱 추가
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

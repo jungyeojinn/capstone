@@ -37,17 +37,11 @@ class login(APIView) :
 	
     ## JWT
     token = TokenObtainPairSerializer.get_token(user)
-    refresh_token = str(token)
     access_token = str(token.access_token)
     res = Response(
       {
-        "user": serialize_user.data,
-        "message": "login success",
         "userType" : usertype,
-        "token":{
-          "access": access_token,
-          "refresh": refresh_token,
-        },
+        "token": access_token,
       },
       status=status.HTTP_200_OK,
     )
