@@ -44,3 +44,17 @@ class quotes(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save(userId=request.user, freightId=freight)    #견적 등록시 로그인한 사용자의 id를 저장, freightId를 context로 넘겨줌
             return Response(status=201)
+    
+    @swagger_auto_schema(
+        operation_description="견적 수락",
+        operation_summary="견적 수락",
+        tags=['quotes'],
+        request_body=openapi.Schema(type=openapi.TYPE_INTEGER, property={'quoteId': '견적 id'}),
+        response={200: openapi.Response(description='견적 수락 성공')}
+    )
+    def patch(self, request):      #견적 수락
+        quoteId = request.data['quoteId']
+        quote = get_object_or_404(Quote, pk=quoteId)
+        quote.isAccepted = True
+        quote.save()
+        return Response(status=200)
