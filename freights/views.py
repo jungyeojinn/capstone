@@ -5,19 +5,33 @@ from rest_framework.decorators import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 @permission_classes([IsAuthenticated])
-class freight(APIView):    
+class freight(APIView):
+    @swagger_auto_schema(
+        operation_description="포워더 사용자라면 등록되어 있는 모든 화물을 조회\n수출기업 사용자라면 해당 사용자의 화물만을 조회",
+        operation_summary="화물 조회",
+        tags=['freights'],
+        responses={200: openapi.Response(description='화물 조회 성공', schema=FreightSerializer(many=True))},
+    )
     def get(self, request):     #화물 조회
         user=request.user
         if user.isForwarder == True:
             serializer = FreightSerializer(Freight.objects.all(), many=True)
-            return Response(serializer.data)      #포워더라면 등록되어 있는 모든 화물을 조회함
+            return Response(serializer.data, status=200)      #포워더라면 등록되어 있는 모든 화물을 조회함
         else:
             userFreights = Freight.objects.filter(userId=request.user.userId)    #해당 사용자의 화물 모두 조회
             serializer = FreightSerializer(userFreights, many=True)
-            return Response(serializer.data)
+            return Response(serializer.data, status=200)
     
+    @swagger_auto_schema(
+        operation_description="화물 등록",
+        operation_summary="화물 등록",
+        tags=['freights'],
+        request_body=FreightSerializer,
+        responses={201: openapi.Response(description='화물 등록 성공')})
     def post(self,request):     #화물 등록
         serializer = FreightSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):

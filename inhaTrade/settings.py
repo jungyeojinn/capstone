@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt', # JWT 추가
     'freights.apps.FreightsConfig', # freight 앱 추가
     'quotes.apps.QuotesConfig', # quotes 앱 추가
+    'drf_yasg', # swagger 추가
 ]
 
 MIDDLEWARE = [
@@ -153,4 +154,14 @@ SIMPLE_JWT = {
     'TOKEN_TYPE_CLAIM': "token_type",
 
     'JTI_CLAIM': 'jti',
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Token': {
+            'type': 'apiKey',
+            'in': 'header',
+            'name': 'Authorization'
+        }
+    },
 }
