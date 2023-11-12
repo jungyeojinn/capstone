@@ -1,12 +1,15 @@
 from django.shortcuts import render
 from .models import Freight
 from .serializers import FreightSerializer
+from quotes.models import Quote
+from quotes.serializers import QuoteSerializer
 from rest_framework.decorators import APIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.shortcuts import get_object_or_404
 
 @permission_classes([IsAuthenticated])
 class freight(APIView):
@@ -37,3 +40,17 @@ class freight(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save(userId=request.user)    #화물 등록시 로그인한 사용자의 id를 저장
             return Response(status=201)
+
+
+@permission_classes([IsAuthenticated])
+class freight_detail(APIView):
+    @swagger_auto_schema(
+        operation_description="화물에 대한 견적 조회",
+        operation_summary="화물에 대한 견적 조회",
+        tags=['freights'],
+        responses={200: openapi.Response(description='견적 조회 성공', schema=QuoteSerializer(many=True))})
+    def get(self, request, freight_id):
+        quote = get_object_or_404(Quote, freightId=freight_id)
+        serializer = QuoteSerializer(quote, many=True)
+        return Response(serializer.data, status=200)
+        
