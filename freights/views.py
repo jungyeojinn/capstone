@@ -41,6 +41,25 @@ class freight(APIView):
             serializer.save(userId=request.user)    #화물 등록시 로그인한 사용자의 id를 저장
             return Response(status=201)
 
+    @swagger_auto_schema(
+        operation_description="화물 삭제",
+        operation_summary="화물 삭제",
+        tags=['freights'],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'freightId': openapi.Schema(type=openapi.TYPE_INTEGER, description='화물 id')}
+        ),
+        responses={200: openapi.Response(description='화물 삭제 성공'), 400: openapi.Response(description='화물 삭제 실패')})
+    def delete(self,request):   #화물 삭제
+        user=request.user
+        item = get_object_or_404(Freight, freightId=request.data['freightId'])  #파라미터로 넘어온 freightId를 가진 화물을 찾음
+        if user.userId == item.userId:  #삭제하려는 화물의 작성자가 로그인한 사용자와 같다면
+            item.delete()
+            return Response(status=200) #삭제 성공
+        else:
+            return Response(status=400) #삭제 실패
+
 
 @permission_classes([IsAuthenticated])
 class freight_detail(APIView):

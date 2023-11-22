@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure--!d-1tmu$29fo5lsk_-k#x90rwto0%3f%!5l!_oj33emw1qzg%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["backend-htvis.run.goorm.io",]
+ALLOWED_HOSTS = ["backend-htvis.run.goorm.io","127.0.0.1"]
 
 # Application definition
 

@@ -58,6 +58,25 @@ class quotes(APIView):
         serializer = QuoteSerializer(quote, data=request.data, partial=True)        # partial=True로 설정하여 전체 필드가 아닌 일부 필드만 수정 가능하게 함
         serializer.save()
         return Response(status=200)
+    
+    @swagger_auto_schema(
+        operation_description="견적 삭제",
+        operation_summary="견적 삭제",
+        tags=['quotes'],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'quoteId': openapi.Schema(type=openapi.TYPE_INTEGER, description='삭제하려는 견적의 id')}
+        ),
+        responses={200: openapi.Response(description='견적 삭제 성공'), 400: openapi.Response(description='견적 삭제 실패')})
+    def delete(self,request):   #견적 삭제
+        user=request.user
+        item = get_object_or_404(Quote, id=request.data['quoteId'])  #파라미터로 넘어온 quoteId를 가진 화물을 찾음
+        if user.userId == item.userId:
+            item.delete()
+            return Response(status=200) #삭제 성공
+        else:
+            return Response(status=400) #삭제 실패
 
 @permission_classes([IsAuthenticated])
 class accept(APIView):
