@@ -5,5 +5,5 @@ app_name = 'quotes'
 
 urlpatterns = [
     path('', views.quotes.as_view()),
-    path('accepted', views.accepted_quotes.as_view()),
+    path('accept', views.accept.as_view()),
 ]

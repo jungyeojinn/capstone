@@ -38,28 +38,29 @@ class quotes(APIView):
     def post(self, request):     #견적 등록
         freightId = request.data['freightId']
         freight = get_object_or_404(Freight, pk=freightId)
-        data=request.data
+        #data=request.data
         serializer = QuoteSerializer(data=request.data) 
         if serializer.is_valid(raise_exception=True):
             serializer.save(userId=request.user, freightId=freight)    #견적 등록시 로그인한 사용자의 id를 저장, freightId를 context로 넘겨줌
             return Response(status=201)
     
     @swagger_auto_schema(
-        operation_description="견적 수락",
-        operation_summary="견적 수락",
+        operation_description="견적 수정",
+        operation_summary="견적 수정",
         tags=['quotes'],
-        request_body=openapi.Schema(type=openapi.TYPE_INTEGER, property={'quoteId': '견적 id'}),
-        response={200: openapi.Response(description='견적 수락 성공')}
+        #swagger가 partial을 지원하지 않음
+        requst_body=QuoteSerializer,                  
+        response={200: openapi.Response(description='견적 수정 성공')}
     )
-    def patch(self, request):      #견적 수락
+    def patch(self, request):      #견적 수정
         quoteId = request.data['quoteId']
         quote = get_object_or_404(Quote, pk=quoteId)
-        quote.isAccepted = True
-        quote.save()
+        serializer = QuoteSerializer(quote, data=request.data, partial=True)        # partial=True로 설정하여 전체 필드가 아닌 일부 필드만 수정 가능하게 함
+        serializer.save()
         return Response(status=200)
 
 @permission_classes([IsAuthenticated])
-class accepted_quotes(APIView):
+class accept(APIView):
     @swagger_auto_schema(
         operation_description="수락된 견적 조회",
         operation_summary="자신이 등록한 견적 중 수락된 견적 조회",
@@ -69,8 +70,22 @@ class accepted_quotes(APIView):
     def get(self, request):     #포워딩 업체 사용자가 등록한 견적 중 수출기업에 의해 수락된 견적을 조회할 수 있음
         user=request.user
         if user.isForwarder == True:
-            userQuotes = Quote.objects.filter(userId=request.user.userId, isAccepted=True)    #해당 사용자의 견적 중 수락된 견적을 모두 조회
+            userQuotes = Quote.objects.filter(userId=request.user.userId, isAccepted=True)                      #해당 사용자의 견적 중 수락된 견적을 모두 조회
             serializer = QuoteListSerializer(userQuotes, many=True)
             return Response(serializer.data, status=200)        #포워더 사용자라면 자신이 수락한 견적을 조회함
         else:
             return Response(status=403)             #수출기업 사용자라면 조회할 수 없음
+    
+    @swagger_auto_schema(
+    operation_description="견적 수락",
+    operation_summary="견적 수락",
+    tags=['quotes'],
+    request_body=openapi.Schema(type=openapi.TYPE_INTEGER, property={'quoteId': '견적 id'}),
+    response={200: openapi.Response(description='견적 수락 성공')}
+    )
+    def patch(self, request):      #견적 수락
+        quoteId = request.data['quoteId']
+        quote = get_object_or_404(Quote, pk=quoteId)
+        quote.isAccepted = True
+        quote.save()
+        return Response(status=200)
