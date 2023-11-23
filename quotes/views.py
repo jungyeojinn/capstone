@@ -41,11 +41,12 @@ class quotes(APIView):
         #data=request.data
         serializer = QuoteSerializer(data=request.data) 
         if serializer.is_valid(raise_exception=True):
+            request.user.totalItems += 1    #견적 등록시 사용자의 totalItems 1 증가
             serializer.save(userId=request.user, freightId=freight)    #견적 등록시 로그인한 사용자의 id를 저장, freightId를 context로 넘겨줌
             return Response(status=201)
     
     @swagger_auto_schema(
-        operation_description="견적 수정",
+        operation_description="견적 수정. 일부 필드만 수정 가능. parameter로 'shippingCompany','totalCharge','departureDate','arrivalDate','isFCL','content' 중 수정할 내용만 전송",
         operation_summary="견적 수정",
         tags=['quotes'],
         #swagger가 partial을 지원하지 않음
@@ -74,6 +75,7 @@ class quotes(APIView):
         item = get_object_or_404(Quote, id=request.data['quoteId'])  #파라미터로 넘어온 quoteId를 가진 화물을 찾음
         if user.userId == item.userId:
             item.delete()
+            request.user.totalItems -= 1    #견적 삭제시 사용자의 totalItems 1 감소
             return Response(status=200) #삭제 성공
         else:
             return Response(status=400) #삭제 실패
@@ -84,7 +86,7 @@ class accept(APIView):
         operation_description="수락된 견적 조회",
         operation_summary="자신이 등록한 견적 중 수락된 견적 조회",
         tags=['quotes'],
-        response={200: openapi.Response(description='견적 조회 성공', schema=QuoteListSerializer(many=True)), 400: openapi.Response(description='포워더 사용자가 아니라면 조회할 수 없음')}
+        responses={200: openapi.Response(description='견적 조회 성공', schema=QuoteListSerializer(many=True)), 400: openapi.Response(description='포워더 사용자가 아니라면 조회할 수 없음')}
     )
     def get(self, request):     #포워딩 업체 사용자가 등록한 견적 중 수출기업에 의해 수락된 견적을 조회할 수 있음
         user=request.user

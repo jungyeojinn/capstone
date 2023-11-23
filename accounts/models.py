@@ -35,4 +35,5 @@ class User(AbstractUser):
     email = models.EmailField(max_length=50)
     isForwarder = models.BooleanField(default=False)
     objects = UserManager()
+    totalItems = models.IntegerField(default=0) # 사용자가 등록한 화물/견적의 총 개수
     USERNAME_FIELD = 'userId' # 로그인 시 사용할 필드를 지정
