@@ -51,6 +51,12 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_ALLOW_ALL=True
 ROOT_URLCONF = 'inhaTrade.urls'
+# CSRF
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_TRUSTED_ORIGINS = ['https://backend-htvis.run.goorm.site']
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
 
 TEMPLATES = [
     {
