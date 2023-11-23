@@ -169,3 +169,12 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+# 이메일로 알림을 보내기 위한 설정
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = 'inhatrademail@gmail.com'
+EMAIL_HOST_PASSWORD = 
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

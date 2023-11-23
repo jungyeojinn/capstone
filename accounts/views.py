@@ -1,20 +1,23 @@
 from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes #@permission_classes ([AllowAny]) 데코레이션 추가하여 해당 뷰에 접근할 때 인증 절차를 거치지 않도록 함
+from rest_framework.decorators import api_view, APIView, permission_classes #@permission_classes ([AllowAny]) 데코레이션 추가하여 해당 뷰에 접근할 때 인증 절차를 거치지 않도록 함
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from .serializers import userSerializer,userDetailSerializer
-from rest_framework.decorators import APIView
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.renderers import JSONRenderer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework.decorators import APIView, permission_classes
-from rest_framework.permissions import IsAuthenticated
 import jwt, datetime
 from .models import User
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+@swagger_auto_schema(
+  operation_description="사용자 정보 조회",
+  operation_summary="사용자 정보 조회",
+  tags=['accounts'],
+  methods=['get'],
+  responses={200: openapi.Response(description='사용자 정보 조회 성공', schema=userDetailSerializer)})
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def detail(request):      #사용자 정보 조회

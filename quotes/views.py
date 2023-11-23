@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.decorators import api_view
+from django.core.mail import EmailMessage
+
 
 @permission_classes([IsAuthenticated])
 class quotes(APIView):
@@ -38,11 +40,17 @@ class quotes(APIView):
     def post(self, request):     #견적 등록
         freightId = request.data['freightId']
         freight = get_object_or_404(Freight, pk=freightId)
-        #data=request.data
         serializer = QuoteSerializer(data=request.data) 
+        email = EmailMessage(
+            '견적이 등록되었습니다.',       # 제목
+            ' ',       # 내용
+            to=[freight.userId.email],  # 등록한 견적의 화물 소유자에게 이메일 전송
+        )
+        email.send()
         if serializer.is_valid(raise_exception=True):
             request.user.totalItems += 1    #견적 등록시 사용자의 totalItems 1 증가
             serializer.save(userId=request.user, freightId=freight)    #견적 등록시 로그인한 사용자의 id를 저장, freightId를 context로 넘겨줌
+            request.user.save()
             return Response(status=201)
     
     @swagger_auto_schema(
@@ -76,6 +84,7 @@ class quotes(APIView):
         if user.userId == item.userId:
             item.delete()
             request.user.totalItems -= 1    #견적 삭제시 사용자의 totalItems 1 감소
+            request.user.save()
             return Response(status=200) #삭제 성공
         else:
             return Response(status=400) #삭제 실패
@@ -109,4 +118,10 @@ class accept(APIView):
         quote = get_object_or_404(Quote, pk=quoteId)
         quote.isAccepted = True
         quote.save()
+        email = EmailMessage(
+            '견적이 수락되었습니다.',       # 제목
+            ' ',       # 내용
+            to=[quote.userId.email],  # 수락한 견적의 작성자에게 이메일 전송
+        )
+        email.send()
         return Response(status=200)
