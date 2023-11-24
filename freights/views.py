@@ -41,29 +41,7 @@ class freight(APIView):
             serializer.save(userId=request.user)    #화물 등록시 로그인한 사용자의 id를 저장
             request.user.totalItems += 1            #화물 등록시 사용자의 totalItems를 1 증가
             request.user.save()
-            return Response(status=201)
-
-    @swagger_auto_schema(
-        operation_description="화물 삭제",
-        operation_summary="화물 삭제",
-        tags=['freights'],
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'freightId': openapi.Schema(type=openapi.TYPE_INTEGER, description='화물 id')}
-        ),
-        responses={200: openapi.Response(description='화물 삭제 성공'), 400: openapi.Response(description='화물 삭제 실패')})
-    def delete(self,request):   #화물 삭제
-        user=request.user
-        item = get_object_or_404(Freight, id=request.data.get('freightId'))  #파라미터로 넘어온 freightId를 가진 화물을 찾음
-        if user == item.userId:  #삭제하려는 화물의 작성자가 로그인한 사용자와 같다면 삭제. 외래키로 연결된 객체를 직접 비교함
-            item.delete()
-            request.user.totalItems -= 1    #화물 삭제시 사용자의 totalItems를 1 감소
-            request.user.save()
-            return Response(status=200) #삭제 성공
-        else:
-            return Response(item.userId, status=400) #삭제 실패
-
+            return Response(status=201)       
 
 @permission_classes([IsAuthenticated])
 class freight_detail(APIView):
@@ -76,4 +54,19 @@ class freight_detail(APIView):
         quote = get_object_or_404(Quote, freightId=freight_id)
         serializer = QuoteSerializer(quote, many=True)
         return Response(serializer.data, status=200)
-        
+    
+    @swagger_auto_schema(
+        operation_description="화물 삭제",
+        operation_summary="화물 삭제",
+        tags=['freights'],
+        responses={200: openapi.Response(description='화물 삭제 성공'), 400: openapi.Response(description='화물 삭제 실패')})
+    def delete(self, request, freight_id):  #화물 삭제
+        user=request.user
+        item = get_object_or_404(Freight, id=freight_id)  #파라미터로 넘어온 freightId를 가진 화물을 찾음
+        if user == item.userId:  #삭제하려는 화물의 작성자가 로그인한 사용자와 같다면 삭제. 외래키로 연결된 객체를 직접 비교함
+            item.delete()
+            request.user.totalItems -= 1    #화물 삭제시 사용자의 totalItems를 1 감소
+            request.user.save()
+            return Response(status=200) #삭제 성공
+        else:
+            return Response(item.userId, status=400) #삭제 실패
