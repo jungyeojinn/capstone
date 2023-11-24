@@ -20,5 +20,8 @@ class Freight(models.Model):
     updated_at = models.DateTimeField(auto_now=True)        #화물 정보 수정 시간
     isCompleted = models.BooleanField(default=False)        #화물 견적 작성이 완료되었는지 여부
     
+    def natural_key(self):
+        return (str(self.userId))
+        
     class Meta:
         ordering = ['-created_at']

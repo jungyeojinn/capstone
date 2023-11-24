@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Freight
-from .serializers import FreightSerializer
+from .serializers import FreightSerializer, FreightDetailSerializer
 from quotes.models import Quote
 from quotes.serializers import QuoteSerializer
 from rest_framework.decorators import APIView
@@ -22,7 +22,7 @@ class freight(APIView):
     def get(self, request):     #화물 조회
         user=request.user
         if user.isForwarder == True:
-            serializer = FreightSerializer(Freight.objects.all(), many=True)
+            serializer =FreightDetailSerializer(Freight.objects.all(), many=True)
             return Response(serializer.data, status=200)      #포워더라면 등록되어 있는 모든 화물을 조회함
         else:
             userFreights = Freight.objects.filter(userId=request.user.userId)    #해당 사용자의 화물 모두 조회

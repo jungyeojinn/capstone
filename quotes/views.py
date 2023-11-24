@@ -31,7 +31,7 @@ class quotes(APIView):
             return Response(status=403)             #수출기업 사용자라면 조회할 수 없음
 
     @swagger_auto_schema(
-        operation_description="견적 등록",
+        operation_description="견적등록. 견적이 등록된 화물을 가진 수출기업 사용자에게 견적이 등록되었음을 알리는 메일 전송",
         operation_summary="견적 등록",
         tags=['quotes'],
         request_body=QuoteSerializer,
@@ -107,7 +107,7 @@ class accept(APIView):
             return Response(status=403)             #수출기업 사용자라면 조회할 수 없음
     
     @swagger_auto_schema(
-    operation_description="견적 수락",
+    operation_description="견적 수락. 견적을 등록한 포워더에게 견적이 수락되었음을 알리는 메일 전송",
     operation_summary="견적 수락",
     tags=['quotes'],
     request_body=openapi.Schema(type=openapi.TYPE_INTEGER, property={'quoteId': '견적 id'}),
