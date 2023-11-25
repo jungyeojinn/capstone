@@ -8,6 +8,7 @@ class QuoteListSerializer(serializers.ModelSerializer):
         fields = ('id','freightId','shippingCompany','totalCharge','departureDate','arrivalDate','isFCL','content','created_at','updated_at','isAccepted',)
 
 class QuoteSerializer(serializers.ModelSerializer): #견적 등록 시 사용 freightId를 외부에서 처리
+    id = serializers.CharField(read_only=True)
     class Meta:
         model = Quote
-        fields = ('shippingCompany','totalCharge','departureDate','arrivalDate','isFCL','content','created_at','updated_at','isAccepted',)
+        fields = ('id','shippingCompany','totalCharge','departureDate','arrivalDate','isFCL','content','created_at','updated_at','isAccepted',)

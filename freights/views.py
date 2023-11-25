@@ -17,7 +17,7 @@ class freight(APIView):
         operation_description="포워더 사용자라면 등록되어 있는 모든 화물을 조회\n수출기업 사용자라면 해당 사용자의 화물만을 조회",
         operation_summary="화물 조회",
         tags=['freights'],
-        responses={200: openapi.Response(description='화물 조회 성공', schema=FreightSerializer(many=True))},
+        responses={200: openapi.Response(description='화물 조회 성공', schema=FreightDetailSerializer(many=True))},
     )
     def get(self, request):     #화물 조회
         user=request.user
