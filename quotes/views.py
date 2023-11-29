@@ -65,8 +65,9 @@ class quotes(APIView):
         quoteId = request.data['quoteId']
         quote = get_object_or_404(Quote, pk=quoteId)
         serializer = QuoteSerializer(quote, data=request.data, partial=True)        # partial=True로 설정하여 전체 필드가 아닌 일부 필드만 수정 가능하게 함
-        serializer.save()
-        return Response(status=200)
+        if(serializer.is_valid(raise_exception=True)):
+            serializer.save()
+            return Response(status=200)
 
 @permission_classes([IsAuthenticated])
 class accept(APIView):
@@ -95,6 +96,9 @@ class accept(APIView):
     def patch(self, request):      #견적 수락
         quoteId = request.data['quoteId']
         quote = get_object_or_404(Quote, pk=quoteId)
+        freight = get_object_or_404(Freight, pk=quote.freightId.pk)
+        freight.isCompleted = True  #해당 견적에 연결된 화물의 isCompleted 플래그를 True로 바꿈
+        freight.save()
         quote.isAccepted = True
         quote.save()
         email = EmailMessage(

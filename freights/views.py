@@ -22,8 +22,8 @@ class freight(APIView):
     def get(self, request):     #화물 조회
         user=request.user
         if user.isForwarder == True:
-            serializer =FreightDetailSerializer(Freight.objects.all(), many=True)
-            return Response(serializer.data, status=200)      #포워더라면 등록되어 있는 모든 화물을 조회함
+            serializer =FreightDetailSerializer(Freight.objects.filter(isCompleted=False), many=True)
+            return Response(serializer.data, status=200)      #포워더라면 등록되어 있는 화물 중 견적 수락이 완료되지 않은 화물을 모두 조회함
         else:
             userFreights = Freight.objects.filter(userId=request.user.userId)    #해당 사용자의 화물 모두 조회
             serializer = FreightSerializer(userFreights, many=True)
