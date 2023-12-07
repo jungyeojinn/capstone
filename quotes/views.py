@@ -41,11 +41,13 @@ class quotes(APIView):
         freightId = request.data['freightId']
         freight = get_object_or_404(Freight, pk=freightId)
         serializer = QuoteSerializer(data=request.data) 
+        messageContent = '안녕하세요. 배달의 만족 팀입니다.\n인하 트레이드 서비스를 이용해주셔서 감사합니다.\n\n최근 사용자께서 요청하신\'' + freight.productName + '\'견적이 도착했습니다!\n\n앱을 통해 견적을 확인해주세요.\n고맙습니다.' 
         email = EmailMessage(
             '견적이 등록되었습니다.',       # 제목
-            ' ',       # 내용
+            messageContent,       # 내용
             to=[freight.userId.email],  # 등록한 견적의 화물 소유자에게 이메일 전송
         )
+        email.attach('logo.png', open('logo.png', 'rb').read(), 'image/png')
         email.send()
         if serializer.is_valid(raise_exception=True):
             request.user.totalItems += 1    #견적 등록시 사용자의 totalItems 1 증가
