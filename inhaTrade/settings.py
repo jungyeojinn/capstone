@@ -2,6 +2,7 @@ import django
 from pathlib import Path
 import datetime
 from django.utils.translation import gettext
+import os
 #django.utils.translation.ugettext = gettext
 
 
@@ -72,6 +73,10 @@ TEMPLATES = [
             ],
         },
     },
+]
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 WSGI_APPLICATION = 'inhaTrade.wsgi.application'

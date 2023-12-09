@@ -63,7 +63,6 @@ class freight_detail(APIView):
     def delete(self, request, freight_id):  #화물 삭제
         user=request.user
         item = get_object_or_404(Freight, id=freight_id)
-        #Freight.objects.filter(id=freight_id)  #파라미터로 넘어온 freightId를 가진 화물을 찾음
         if user == item.userId:  #삭제하려는 화물의 작성자가 로그인한 사용자와 같다면 삭제. 외래키로 연결된 객체를 직접 비교함
             item.delete()
             request.user.totalItems -= 1    #화물 삭제시 사용자의 totalItems를 1 감소
